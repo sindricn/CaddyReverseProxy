@@ -1,14 +1,20 @@
 #!/bin/sh
 set -e
 
-if [ -z "$DOMAIN" ] || [ -z "$TARGET" ]; then
-  echo "❌ 未设置环境变量 DOMAIN 和 TARGET，无法启动 Caddy"
+if [ -z "$DOMAIN" ] || [ -z "$TARGET" ] || [ -z "$EMAIL" ]; then
+  echo "❌ Missing one of DOMAIN / TARGET / EMAIL"
   exit 1
 fi
 
-echo "🔧 配置域名 $DOMAIN 代理到 $TARGET"
+echo "🔧 Setting up reverse proxy: $DOMAIN → $TARGET (email: $EMAIL)"
 
 cat > /etc/caddy/Caddyfile <<EOF
+{
+  email $EMAIL
+  acme_ca https://acme-v02.api.letsencrypt.org/directory
+  acme_http_challenge
+}
+
 $DOMAIN {
   handle /.well-known/acme-challenge/* {
     root * /var/www/html
@@ -28,4 +34,3 @@ $DOMAIN {
 EOF
 
 exec caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
-
