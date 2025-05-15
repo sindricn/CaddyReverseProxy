@@ -10,7 +10,14 @@ echo "🔁 Setting up redirection: $DOMAIN → $TARGET"
 
 cat > /etc/caddy/Caddyfile <<EOF
 $DOMAIN {
-  redir $TARGET 301
+  handle /.well-known/acme-challenge/* {
+    root * /var/www/html
+    file_server
+  }
+
+  handle {
+    redir $TARGET 301
+  }
 }
 EOF
 
