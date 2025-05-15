@@ -1,51 +1,91 @@
+# Caddy Reverse Proxy
 
-# 一键部署 Caddy 反向代理
+一个快速部署的反向代理服务，支持自动生成 Caddyfile 并通过 Docker 容器运行。适用于 Cloudflare Pages、Vercel、Netlify 等平台的自定义域名访问加速。
 
-此脚本用于加速访问在其他平台（如 Cloudflare Pages、Vercel、Netlify 等）部署的站点，并绑定自定义域名，支持自动生成 Caddyfile 配置并启动 Docker 容器。
+---
 
-## 功能
+## 🚀 一键 Docker 部署（使用预构建镜像）
 
-- 自动安装 Docker 容器版 Caddy
-- 生成最小反向代理 Caddyfile 配置
-- 支持命令行参数或交互式输入
+适合快速部署，使用你未来构建并发布的 Docker 镜像（如：`sindricn/caddy-reverse-proxy`）：
 
-## 使用方法
+```bash
+docker run -d \
+  --name caddy-reverse-proxy \
+  -e DOMAIN=example.com \
+  -e TARGET=https://your.target.url \
+  -p 80:80 -p 443:443 \
+  sindricn/caddy-reverse-proxy
+```
 
-### 方式一：命令行参数方式（推荐）
+**参数说明：**
 
-如果你已经有域名和目标 URL，直接使用以下命令：
+* `DOMAIN`：你的自定义域名（例如：`example.com`）。
+* `TARGET`：目标地址（例如：`https://your.target.url`）。
+
+> ✅ 此方式依赖你发布的镜像，未来在 Docker Hub/GitHub Container Registry 发布后使用。
+
+---
+
+## 🧩 使用 Docker Compose 部署
+
+适合在开发/生产中统一管理服务：
+
+### 示例 `docker-compose.yml`
+
+```yaml
+version: '3'
+services:
+  proxy:
+    image: sindricn/caddy-reverse-proxy
+    container_name: caddy-reverse-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - DOMAIN=example.com
+      - TARGET=https://your.target.url
+```
+
+### 运行
+
+```bash
+docker-compose up -d
+```
+
+---
+
+## 🛠️ 手动部署（本地生成 Caddyfile 并运行 Caddy 容器）
+
+适合自定义配置或开发测试。
+
+### 1. 克隆项目
+
+```bash
+git clone https://github.com/sindricn/CaddyReverseProxy.git
+cd CaddyReverseProxy
+```
+
+### 2. 命令行参数方式（推荐）
 
 ```bash
 chmod +x deploy.sh
 ./deploy.sh yourdomain.com https://yourtarget.url
-````
+```
 
-### 方式二：交互式输入方式
-
-如果你不想传递命令行参数，可以直接运行脚本，脚本会提示输入：
+### 3. 交互式方式
 
 ```bash
+chmod +x deploy.sh
 ./deploy.sh
 ```
 
-然后依次输入你的 **域名** 和 **目标 URL**。
+然后根据提示输入：
 
-## 依赖
+* 域名（如：`example.com`）
+* 目标地址（如：`https://target.pages.dev`）
 
-* Docker: 确保系统已安装 Docker
+---
 
-## 注意事项
-
-* 脚本默认自动申请 HTTPS 证书，Caddy 会使用 Let's Encrypt。
-* 请确保你的域名已经正确解析到服务器公网 IP。
-* 脚本不会覆盖已存在的容器，更新时请手动删除旧容器：`docker rm -f caddy-reverse-proxy`。
-
-## 支持平台
-
-* Cloudflare Pages
-* Vercel
-* Netlify
-
-其他平台的静态网站同样适用。
+如有建议或问题，欢迎提交 issue 或 PR！
 
 
