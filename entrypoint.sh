@@ -10,10 +10,18 @@ echo "🔧 配置域名 $DOMAIN 代理到 $TARGET"
 
 cat > /etc/caddy/Caddyfile <<EOF
 $DOMAIN {
-  reverse_proxy {
-    to $TARGET
-    transport http {
-      tls_insecure_skip_verify
+  handle /.well-known/acme-challenge/* {
+    root * /var/www/html
+    file_server
+  }
+
+  handle {
+    reverse_proxy $TARGET {
+      header_up Host {http.reverse_proxy.upstream.host}
+      transport http {
+        tls
+        tls_insecure_skip_verify
+      }
     }
   }
 }
