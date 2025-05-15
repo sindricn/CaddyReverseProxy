@@ -12,7 +12,6 @@ cat > /etc/caddy/Caddyfile <<EOF
 {
   email $EMAIL
   acme_ca https://acme-v02.api.letsencrypt.org/directory
-  acme_http_challenge
 }
 
 $DOMAIN {
