@@ -2,7 +2,7 @@
 set -e
 
 if [ -z "$DOMAIN" ] || [ -z "$TARGET" ] || [ -z "$EMAIL" ]; then
-  echo "❌ Missing DOMAIN / TARGET / EMAIL"
+  echo "❌ DOMAIN / TARGET / EMAIL 未设置"
   exit 1
 fi
 
@@ -12,14 +12,6 @@ echo "  TARGET = $TARGET"
 echo "  EMAIL  = $EMAIL"
 
 cat > /etc/caddy/Caddyfile <<EOF
-{
-  email $EMAIL
-  acme_ca https://acme-v02.api.letsencrypt.org/directory
-  acme_http_challenge {
-    enabled true
-  }
-}
-
 $DOMAIN {
   tls $EMAIL
 
