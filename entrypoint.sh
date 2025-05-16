@@ -14,7 +14,6 @@ echo "  EMAIL   = $EMAIL"
 cat > /etc/caddy/Caddyfile <<EOF
 {
   email ${EMAIL}
-  acme_dns cloudflare
 }
 
 ${DOMAIN} {
