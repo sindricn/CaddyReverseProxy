@@ -1,32 +1,28 @@
 #!/bin/sh
 set -e
 
-if [ -z "$DOMAIN" ] || [ -z "$TARGET" ] || [ -z "$EMAIL" ]; then
-  echo "❌ DOMAIN / TARGET / EMAIL 未设置"
+if [ -z "$DOMAIN" ] || [ -z "$TARGET" ] || [ -z "$EMAIL" ] || [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+  echo "❌ Required environment variables: DOMAIN, TARGET, EMAIL, CLOUDFLARE_API_TOKEN"
   exit 1
 fi
 
-echo "🔧 Setting up Caddy reverse proxy:"
-echo "  DOMAIN = $DOMAIN"
-echo "  TARGET = $TARGET"
-echo "  EMAIL  = $EMAIL"
+echo "🔧 Setting up Caddy DNS-based reverse proxy:"
+echo "  DOMAIN  = $DOMAIN"
+echo "  TARGET  = $TARGET"
+echo "  EMAIL   = $EMAIL"
 
 cat > /etc/caddy/Caddyfile <<EOF
 $DOMAIN {
-  tls $EMAIL
-
-  handle /.well-known/acme-challenge/* {
-    root * /var/www/html
-    file_server
+  tls {
+    dns cloudflare \$CLOUDFLARE_API_TOKEN
+    email $EMAIL
   }
 
-  handle {
-    reverse_proxy $TARGET {
-      header_up Host {http.reverse_proxy.upstream.host}
-      transport http {
-        tls
-        tls_insecure_skip_verify
-      }
+  reverse_proxy $TARGET {
+    header_up Host {http.reverse_proxy.upstream.host}
+    transport http {
+      tls
+      tls_insecure_skip_verify
     }
   }
 }
