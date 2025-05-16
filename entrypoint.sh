@@ -10,6 +10,8 @@ echo "🔧 Setting up Caddy DNS-based reverse proxy:"
 echo "  DOMAIN  = $DOMAIN"
 echo "  TARGET  = $TARGET"
 echo "  EMAIL   = $EMAIL"
+echo "  CLOUDFLARE_API_TOKEN  = ${CLOUDFLARE_API_TOKEN}"
+
 
 # 设置 Cloudflare token 到环境变量（Caddy 将读取它）
 export CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
