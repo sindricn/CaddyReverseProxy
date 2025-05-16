@@ -11,24 +11,18 @@ echo "  DOMAIN  = $DOMAIN"
 echo "  TARGET  = $TARGET"
 echo "  EMAIL   = $EMAIL"
 
+# 设置 Cloudflare token 到环境变量（Caddy 将读取它）
+export CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+
 cat > /etc/caddy/Caddyfile <<EOF
 {
   email ${EMAIL}
 }
 
 ${DOMAIN} {
-  reverse_proxy ${TARGET} {
-    header_up Host {http.reverse_proxy.upstream.host}
-    transport http {
-      tls
-      tls_insecure_skip_verify
-    }
-  }
-
+  reverse_proxy ${TARGET}
   tls {
-    dns cloudflare {
-      token ${CLOUDFLARE_API_TOKEN}
-    }
+    dns cloudflare
   }
 }
 EOF
