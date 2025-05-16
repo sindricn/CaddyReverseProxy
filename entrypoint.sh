@@ -12,17 +12,23 @@ echo "  TARGET  = $TARGET"
 echo "  EMAIL   = $EMAIL"
 
 cat > /etc/caddy/Caddyfile <<EOF
-$DOMAIN {
-  tls {
-    dns cloudflare \$CLOUDFLARE_API_TOKEN
-    email $EMAIL
-  }
+{
+  email ${EMAIL}
+  acme_dns cloudflare
+}
 
-  reverse_proxy $TARGET {
+${DOMAIN} {
+  reverse_proxy ${TARGET} {
     header_up Host {http.reverse_proxy.upstream.host}
     transport http {
       tls
       tls_insecure_skip_verify
+    }
+  }
+
+  tls {
+    dns cloudflare {
+      token ${CLOUDFLARE_API_TOKEN}
     }
   }
 }
