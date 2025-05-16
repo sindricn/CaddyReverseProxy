@@ -1,31 +1,18 @@
 #!/bin/sh
 set -e
 
-if [ -z "$DOMAIN" ] || [ -z "$TARGET" ] || [ -z "$EMAIL" ] || [ -z "$CLOUDFLARE_API_TOKEN" ]; then
-  echo "❌ Required environment variables: DOMAIN, TARGET, EMAIL, CLOUDFLARE_API_TOKEN"
+if [ -z "$DOMAIN" ] || [ -z "$TARGET" ]; then
+  echo "❌ Required environment variables: DOMAIN, TARGET"
   exit 1
 fi
 
-echo "🔧 Setting up Caddy DNS-based reverse proxy:"
-echo "  DOMAIN  = $DOMAIN"
-echo "  TARGET  = $TARGET"
-echo "  EMAIL   = $EMAIL"
-echo "  CLOUDFLARE_API_TOKEN  = ${CLOUDFLARE_API_TOKEN}"
-
-
-# 设置 Cloudflare token 到环境变量（Caddy 将读取它）
-export CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+echo "🔧 Starting Caddy Reverse Proxy:"
+echo "  DOMAIN = $DOMAIN"
+echo "  TARGET = $TARGET"
 
 cat > /etc/caddy/Caddyfile <<EOF
-{
-  email ${EMAIL}
-}
-
-${DOMAIN} {
-  reverse_proxy ${TARGET}
-  tls {
-    dns cloudflare
-  }
+$DOMAIN {
+  reverse_proxy $TARGET
 }
 EOF
 
